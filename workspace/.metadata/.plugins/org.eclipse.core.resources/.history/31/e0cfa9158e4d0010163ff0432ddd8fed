@@ -1,0 +1,38 @@
+package ovida.common;
+
+import java.io.Serializable;
+
+public class EngWordEntry extends WordEntry implements Serializable {
+
+	/**
+	 * serial number of the class
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private POS_ENG POS;
+	
+	private void initializeObject(String word, POS_ENG pos, EDIT_LEVEL editLevel) {
+		this.setWord(word);
+		this.setPOS(pos);
+		this.setEditLevel(editLevel);
+	}
+	
+	public EngWordEntry(String word, POS_ENG pos, EDIT_LEVEL editLevel) {
+		
+	}
+	
+	
+	public EngWordEntry(String word, POS_ENG pos) {
+		
+		
+	}
+	
+	public POS_ENG getPOS() {
+		return POS;
+	}
+	
+	public void setPOS(POS_ENG POS) {
+		this.POS = POS;
+	}
+
+}

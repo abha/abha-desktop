@@ -1,0 +1,170 @@
+/**
+ * 
+ */
+package ovida.backend.dal.filehandler;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import ovida.common.EngWordEntry;
+
+/**
+ * @author fadedreamz
+ * @version 0.1
+ * @since 4th March, 2011
+ * 
+ * FileOperation class - Contains the basic file operation for data access
+ * 
+ */
+public class FileOperation {
+	private String BASE_FILE_PATH = "./";
+	
+	private String ENG_DB_FILE_PATH = "eng.dat";
+	
+	private FileOutputStream fout = null;
+	private ObjectOutputStream oout = null;
+	
+	private FileInputStream fin = null;
+	private ObjectInputStream oin = null;
+	
+	
+	/**
+	 * isEngFileWriteMode - checks if the english db file is open for writing mode
+	 * @return true - if open, false otherwise
+	 */
+	private boolean isEngFileWriteMode() {
+		if (fout != null && oout != null)
+			return true;
+		else
+			return false;
+	}
+	
+	public boolean testDBFileExists() {
+		File file = new File(BASE_FILE_PATH + ENG_DB_FILE_PATH);
+	}
+	
+	/**
+	 * isEngFileReadMode - checks if the english file is in read mode
+	 * @return true - if it is in the read mode, false otherwise
+	 */
+	private boolean isEngFileReadMode() {
+		if (fin != null && oin != null)
+			return true;
+		else
+			return false;
+	}
+	
+	
+	/**
+	 * openEngFile - opens the english file for writing / reading mode
+	 * @param mode - 'w' - write mode/ 'r' - read mode
+	 * @throws IOException
+	 */
+	public void openEngFile(char mode) throws IOException {
+		switch(mode) {
+		case 'w':
+			if (isEngFileWriteMode()) {
+				closeEngWriting();
+			}
+			fout = new FileOutputStream(new File(BASE_FILE_PATH + ENG_DB_FILE_PATH));
+			oout = new ObjectOutputStream(fout);
+			break;
+		case 'r':
+			if (isEngFileReadMode()) {
+				closeEngReading();
+			}
+			fin = new FileInputStream(new File(BASE_FILE_PATH + ENG_DB_FILE_PATH));
+			oin = new ObjectInputStream(fin);
+			break;
+			
+			default:
+				break;
+		}
+	}
+	
+	public void closeEngReading() throws IOException {
+		oin.close();
+		fin.close();
+		fin = null;
+		oin = null;
+		System.gc();
+	}
+	
+	public void closeEngWriting() throws IOException {
+		oout.close();
+		fout.close();
+		fout = null;
+		oout = null;
+		System.gc();
+	}
+	
+	private EngWordEntry [] addEngWord(EngWordEntry [] old, EngWordEntry entry) {
+		if ( old == null ) {
+			old = new EngWordEntry[1];
+			old[0] = entry;
+			return old;
+		}
+		
+		int total = old.length;
+		
+		EngWordEntry [] temp = new EngWordEntry[total + 1];
+		
+		for(int i=0; i<total; i++) {
+			temp[i] = old[i];
+		}
+		
+		temp[old.length] = entry;
+		return temp;
+	}
+	
+	public EngWordEntry [] readEngWords() {
+		EngWordEntry [] temp = null;
+		EngWordEntry curWord = null;
+		while(true) {
+			try {
+				curWord = readEngWord();
+				if (curWord == null) {
+					break;
+				} else {
+					temp = addEngWord(temp, curWord);
+				}
+			} catch(IOException exp) {
+				break;
+			}
+		}
+		System.gc();
+		return temp;
+	}
+	
+	public EngWordEntry readEngWord() throws IOException {
+		if (isEngFileReadMode()) {
+			EngWordEntry tmp;
+			try {
+				tmp = (EngWordEntry) oin.readObject();
+			} catch(ClassNotFoundException exp) {
+				return null;
+			}
+			return tmp;
+		}
+		return null;
+	}
+	
+	public void writeEngWords(EngWordEntry [] words) throws IOException {
+		if (words == null)
+			return;
+		int lenght = words.length;
+		for(int i=0; i<lenght; i++)
+			writeEngWord(words[i]);
+	}
+	
+	public void writeEngWord(EngWordEntry word) throws IOException {
+		if (isEngFileWriteMode()) {
+			oout.writeObject(word);
+		}
+	}
+}

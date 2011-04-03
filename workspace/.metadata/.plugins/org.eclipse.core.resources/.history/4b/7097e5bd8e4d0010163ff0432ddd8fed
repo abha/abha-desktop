@@ -1,0 +1,76 @@
+package test;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+
+
+import ovida.backend.dal.filehandler.FileOperation;
+import ovida.common.EngWordEntry;
+import ovida.common.EDIT_LEVEL;
+import ovida.common.POS_ENG;
+import ovida.backend.dal.db.english.DBEnglishWords;
+
+public class Test {
+
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		EngWordEntry word1 = new EngWordEntry("Do", POS_ENG.VERB);
+		DBEnglishWords engWords = DBEnglishWords.getInstance();
+
+		
+		System.out.println("original first word "+ word1.getWord());
+		
+		EngWordEntry word2 = new EngWordEntry("Master", POS_ENG.NOUN);
+		
+		EngWordEntry word3 = new EngWordEntry("খাবি", POS_ENG.VERB);
+		
+		EngWordEntry word4 = new EngWordEntry("Do", POS_ENG.ADJECTIVE);
+		EngWordEntry word5 = new EngWordEntry("খাবি", POS_ENG.PREPOSITION);
+		
+		FileOperation fO = new FileOperation();
+		fO.openEngFile('w');
+		fO.writeEngWord(word1);
+		fO.writeEngWord(word2);
+		fO.writeEngWord(word3);
+		fO.writeEngWord(word4);
+		fO.writeEngWord(word5);
+		fO.closeEngWriting();
+		
+		
+		EngWordEntry [] input = null;
+		fO.openEngFile('r');
+		input = fO.readEngWords();
+		fO.closeEngReading();
+		
+		if (input == null)
+			System.out.println("aww");
+		int length = input.length;
+		for(int i=0; i<length; i++) {
+			engWords.putWord(input[i]);
+		//	System.out.println(input[i].getWord() + " " + input[i].getPOS());
+		}
+		Set<Integer> keys = engWords.getWordMap().keySet();
+		Iterator<Integer> it = keys.iterator();
+		while(it.hasNext()) {
+			Integer curKey = it.next();
+			EngWordEntry word = engWords.getWordAt(curKey);
+			System.out.println(word.getWord() + " " + word.getPOS() + " " + word.getCount());
+		}
+		
+		/*
+		EngWordEntry input1, input2;
+		fO.openEngFile('r');
+		input1 = fO.readEngWord();
+		input2 = fO.readEngWord();
+		System.out.println(input1.getWord());
+		System.out.println(input2.getWord());
+		*/
+	}
+
+}

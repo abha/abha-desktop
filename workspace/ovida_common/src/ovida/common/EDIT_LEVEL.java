@@ -1,0 +1,9 @@
+package ovida.common;
+
+public enum EDIT_LEVEL {
+	INITIALE,
+	FIRST_REVISION,
+	SECOND_REVISION,
+	THIRD_REVISION,
+	FINAL
+}

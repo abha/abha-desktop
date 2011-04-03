@@ -1,0 +1,90 @@
+package test;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+
+
+import ovida.backend.dal.filehandler.FileOperation;
+import ovida.common.EngWordEntry;
+import ovida.common.EDIT_LEVEL;
+import ovida.common.POS_ENG;
+import ovida.backend.dal.db.english.DBEnglishWords;
+
+public class Test {
+
+	
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		EngWordEntry word1 = new EngWordEntry("Do", POS_ENG.VERB);
+		DBEnglishWords engWords = DBEnglishWords.getInstance();
+		word1.setWordID(0);
+		
+		word1.setCount(0);
+		word1.setEditLevel(EDIT_LEVEL.INITIALE);
+		
+		System.out.println("original first word "+ word1.getWord());
+		
+		EngWordEntry word2 = new EngWordEntry();
+		word2.setWord("Master");
+		word2.setWordID(1);
+		word2.setPOS(POS_ENG.NOUN);
+		word2.setCount(0);
+		word2.setEditLevel(EDIT_LEVEL.INITIALE);
+		
+		EngWordEntry word3 = new EngWordEntry();
+		word3.setWord("খাবি");
+		word3.setWordID(2);
+		word3.setPOS(POS_ENG.VERB);
+		word3.setCount(0);
+		word3.setEditLevel(EDIT_LEVEL.INITIALE);
+		
+		EngWordEntry word4 = new EngWordEntry();
+		word4.setWord("Do");
+		word4.setPOS(POS_ENG.ADJECTIVE);
+		word4.setEditLevel(EDIT_LEVEL.INITIALE);
+		
+		FileOperation fO = new FileOperation();
+		fO.openEngFile('w');
+		fO.writeEngWord(word1);
+		fO.writeEngWord(word2);
+		fO.writeEngWord(word3);
+		fO.writeEngWord(word4);
+		fO.closeEngWriting();
+		
+		
+		EngWordEntry [] input = null;
+		fO.openEngFile('r');
+		input = fO.readEngWords();
+		fO.closeEngReading();
+		
+		if (input == null)
+			System.out.println("aww");
+		int length = input.length;
+		for(int i=0; i<length; i++) {
+			engWords.putWord(input[i]);
+		//	System.out.println(input[i].getWord() + " " + input[i].getPOS());
+		}
+		Set<Integer> keys = engWords.getWordMap().keySet();
+		Iterator<Integer> it = keys.iterator();
+		while(it.hasNext()) {
+			Integer curKey = it.next();
+			EngWordEntry word = engWords.getWordAt(curKey);
+			System.out.println(word.getWord() + " " + word.getPOS() + " " + word.getCount());
+		}
+		
+		/*
+		EngWordEntry input1, input2;
+		fO.openEngFile('r');
+		input1 = fO.readEngWord();
+		input2 = fO.readEngWord();
+		System.out.println(input1.getWord());
+		System.out.println(input2.getWord());
+		*/
+	}
+
+}
